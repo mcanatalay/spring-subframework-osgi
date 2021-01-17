@@ -181,9 +181,31 @@ public class SSOContext<A> {
             }
     
             osgiContext.registerService(reference.getClazz(), (E) reference.getObj(), configs);
+            
+            //TODO remove this
+            if(reference.getType() == TYPE_TRANSFORMED_BEAN){
+                Class<?>[] interfaces = reference.getObj().getClass().getInterfaces();
+                if(interfaces != null){
+                    for(Class<?> clazz : interfaces){
+                        if(!clazz.getName().startsWith("java")){
+                            registerInterfacesForOSGi(reference.getName(), clazz, reference.getObj());
+                        }
+                    }
+                }
+            }
         }
 
         LOGGER.info(reference.getType() + " " + reference.getName() + " REGISTERED!");
+    }
+
+    @Deprecated
+    private final <E> void registerInterfacesForOSGi(String name, Class<E> clazz, Object bean){
+        Dictionary<String, String> configs = new Hashtable<>();
+        configs.put(SERVICE_PID, name);
+        configs.put(SERVICE_BEAN_FLAG, "true");
+
+        osgiContext.registerService(clazz, (E) bean, configs);
+        LOGGER.info(TYPE_TRANSFORMED_BEAN + " " + clazz + "(" + name + ")" + " INTERFACE REGISTERED!");
     }
 
     private final <E> void unregister0(SSOReference<E> reference) throws Exception{
