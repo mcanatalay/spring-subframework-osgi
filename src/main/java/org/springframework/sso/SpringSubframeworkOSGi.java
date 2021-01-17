@@ -1,6 +1,8 @@
 package org.springframework.sso;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.concierge.Concierge;
 import org.osgi.framework.BundleContext;
@@ -8,7 +10,11 @@ import org.osgi.framework.launch.Framework;
 import org.springframework.context.support.GenericApplicationContext;
 
 public class SpringSubframeworkOSGi<A> {
-    private static SpringSubframeworkOSGi<?> INSTANCE = null;
+    private static final Map<Class<?>, SpringSubframeworkOSGi<?>> ssoMap = new HashMap<>();
+
+    public static <A> SpringSubframeworkOSGi<A> get(Class<A> appClazz){
+        return (SpringSubframeworkOSGi<A>) ssoMap.get(appClazz);
+    }
 
     public static <A> SpringSubframeworkOSGi<A> run(Class<A> appClazz, GenericApplicationContext context)
         throws SSOAlreadyExistsException, SSOInstantiationException, SSOAlreadyRunningException, SSORunningException{
@@ -27,12 +33,15 @@ public class SpringSubframeworkOSGi<A> {
 
     public static <A> SpringSubframeworkOSGi<A> run(Class<A> appClazz, GenericApplicationContext context, boolean debug, String args[])
         throws SSOAlreadyExistsException, SSOInstantiationException, SSOAlreadyRunningException, SSORunningException{
-        if(INSTANCE != null){
+        if(get(appClazz) != null){
             throw new SSOAlreadyExistsException();
         }
 
         SSOLogger.setStatus(debug);
-        return new SpringSubframeworkOSGi<>(appClazz, context, args).init();
+
+        SpringSubframeworkOSGi<A> sso = new SpringSubframeworkOSGi<>(appClazz, context, args).init();
+        ssoMap.put(appClazz, sso);
+        return sso;
     }
 
     private final SSOContext<A> context;
