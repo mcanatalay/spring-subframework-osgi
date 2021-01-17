@@ -1,0 +1,13 @@
+-Dorg.osgi.framework.storage.clean=onFirstInit
+
+-initlevel 1
+-istart plugins/org.apache.felix.gogo.runtime-1.1.4.jar
+-istart plugins/org.apache.felix.gogo.command-1.1.2.jar
+-istart plugins/org.apache.felix.gogo.shell-1.1.4.jar
+
+-initlevel 2
+-istart plugins/org.apache.felix.scr-2.1.8.jar
+-install plugins/commons-io-2.6.jar
+
+-initlevel 3
+-start plugins/commons-io-2.6.jar
