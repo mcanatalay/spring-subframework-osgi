@@ -17,7 +17,9 @@
 	</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -25,9 +27,9 @@
 		<dependency>
 			<groupId>org.springframework.sso</groupId>
 			<artifactId>concierge</artifactId>
-			<version>6.0.0</version>
+			<version>6.0.1</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/external/concierge-6.0.0.jar</systemPath>
+			<systemPath>${project.basedir}/external/concierge-6.0.1.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>

@@ -4,6 +4,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.felix.gogo.shell.Shell;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.sso.annotation.PostDynamicWire;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,7 +17,7 @@ public class TestComp implements TestInterface {
         System.out.println("Hello world");
     }
     
-    @PostConstruct
+    @PostDynamicWire
     public void init(){
         print();
     }

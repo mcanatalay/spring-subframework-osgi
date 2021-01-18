@@ -17,9 +17,10 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.support.GenericApplicationContext;
 
-public class SSOContext<A> {
+public class SSOContext {
     private static final SSOLogger LOGGER = SSOLogger.getLogger(SSOContext.class.getSimpleName());
 
     public static final String SERVICE_BEAN_FLAG = "flag.bean";
@@ -30,7 +31,6 @@ public class SSOContext<A> {
     public static final Integer TYPE_TRANSFORMED_BEAN = 10;
     public static final Integer TYPE_TRANSFORMED_SERVICE = 20;
 
-    private final Class<A> appClazz;
     private final GenericApplicationContext springContext;
     private final BundleContext osgiContext;
     private final List<SSOContextListener> listeners;
@@ -38,8 +38,7 @@ public class SSOContext<A> {
     private final List<String> processedBeans;
     private boolean status;
 
-    public SSOContext(Class<A> appClazz, GenericApplicationContext springContext, BundleContext osgiContext) {
-        this.appClazz = appClazz;
+    public SSOContext(GenericApplicationContext springContext, BundleContext osgiContext) {
         this.springContext = springContext;
         this.osgiContext = osgiContext;
         this.listeners = Collections.synchronizedList(new ArrayList<>());
@@ -52,7 +51,7 @@ public class SSOContext<A> {
         if(status){
             return;
         }
-
+        SpringDynamicWiringAdmin.run(springContext);
         hookOSGi();
         hookSpring();
     }
@@ -249,9 +248,10 @@ public class SSOContext<A> {
         springContext.getBeanFactory().addBeanPostProcessor(new BeanPostProcessor(){
             @Override
             public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+                Class<?> clazz = bean.getClass();
                 if(
-                    !bean.getClass().getName().startsWith("org.springframework") &&
-                    !bean.getClass().getName().startsWith(appClazz.getName()) &&
+                    !clazz.getName().startsWith("org.springframework") &&
+                    clazz.getAnnotation(SpringBootApplication.class) == null &&
                     !processedBeans.contains(beanName)
                 ){
                     processedBeans.add(beanName);

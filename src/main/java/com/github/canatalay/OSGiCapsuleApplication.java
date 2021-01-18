@@ -13,7 +13,7 @@ public class OSGiCapsuleApplication {
 
     public OSGiCapsuleApplication(GenericApplicationContext context, String[] args){
         try{
-            SpringSubframeworkOSGi.run(OSGiCapsuleApplication.class, context, true, args);
+            SpringSubframeworkOSGi.run(context, true, args);
         } catch(Exception e){
             e.printStackTrace();
         }

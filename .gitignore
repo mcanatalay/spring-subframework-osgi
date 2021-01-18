@@ -6,6 +6,7 @@ target/
 storage
 motd
 plugins
+src/main/java/org/eclipse
 
 ### STS ###
 .apt_generated

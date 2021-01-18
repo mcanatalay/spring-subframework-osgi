@@ -8,46 +8,49 @@ import org.eclipse.concierge.Concierge;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.launch.Framework;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.sso.exception.SSOAlreadyExistsException;
+import org.springframework.sso.exception.SSOAlreadyRunningException;
+import org.springframework.sso.exception.SSOInstantiationException;
 
-public class SpringSubframeworkOSGi<A> {
-    private static final Map<Class<?>, SpringSubframeworkOSGi<?>> ssoMap = new HashMap<>();
+public class SpringSubframeworkOSGi {
+    private static final Map<GenericApplicationContext, SpringSubframeworkOSGi> ssoMap = new HashMap<>();
 
-    public static <A> SpringSubframeworkOSGi<A> get(Class<A> appClazz){
-        return (SpringSubframeworkOSGi<A>) ssoMap.get(appClazz);
+    public static SpringSubframeworkOSGi get(GenericApplicationContext context){
+        return ssoMap.get(context);
     }
 
-    public static <A> SpringSubframeworkOSGi<A> run(Class<A> appClazz, GenericApplicationContext context)
+    public static SpringSubframeworkOSGi run(GenericApplicationContext context)
         throws SSOAlreadyExistsException, SSOInstantiationException, SSOAlreadyRunningException, SSORunningException{
-        return run(appClazz, context, false, new String[]{}).init();
+        return run(context, false, new String[]{}).init();
     }
 
-    public static <A> SpringSubframeworkOSGi<A> run(Class<A> appClazz, GenericApplicationContext context, String args[])
+    public static SpringSubframeworkOSGi run(GenericApplicationContext context, String args[])
         throws SSOAlreadyExistsException, SSOInstantiationException, SSOAlreadyRunningException, SSORunningException{
-        return run(appClazz, context, false, args).init();
+        return run(context, false, args).init();
     }
 
-    public static <A> SpringSubframeworkOSGi<A> run(Class<A> appClazz, GenericApplicationContext context, boolean debug)
+    public static SpringSubframeworkOSGi run(GenericApplicationContext context, boolean debug)
         throws SSOAlreadyExistsException, SSOInstantiationException, SSOAlreadyRunningException, SSORunningException{
-        return run(appClazz, context, debug, new String[]{}).init();
+        return run(context, debug, new String[]{}).init();
     }
 
-    public static <A> SpringSubframeworkOSGi<A> run(Class<A> appClazz, GenericApplicationContext context, boolean debug, String args[])
+    public static SpringSubframeworkOSGi run(GenericApplicationContext context, boolean debug, String args[])
         throws SSOAlreadyExistsException, SSOInstantiationException, SSOAlreadyRunningException, SSORunningException{
-        if(get(appClazz) != null){
+        if(get(context) != null){
             throw new SSOAlreadyExistsException();
         }
 
         SSOLogger.setStatus(debug);
 
-        SpringSubframeworkOSGi<A> sso = new SpringSubframeworkOSGi<>(appClazz, context, args).init();
-        ssoMap.put(appClazz, sso);
+        SpringSubframeworkOSGi sso = new SpringSubframeworkOSGi(context, args).init();
+        ssoMap.put(context, sso);
         return sso;
     }
 
-    private final SSOContext<A> context;
+    private final SSOContext context;
     private boolean status;
 
-    private SpringSubframeworkOSGi(Class<A> appClazz, GenericApplicationContext springContext, String args[]) throws SSOInstantiationException{        
+    private SpringSubframeworkOSGi(GenericApplicationContext springContext, String args[]) throws SSOInstantiationException{        
         Framework osgiFramework;
         try{
             osgiFramework = Concierge.doMain(args);
@@ -63,11 +66,11 @@ public class SpringSubframeworkOSGi<A> {
             throw new SSOInstantiationException();
         }
 
-        this.context = new SSOContext<>(appClazz, springContext, osgiContext);
+        this.context = new SSOContext(springContext, osgiContext);
         this.status = false;
     }
 
-    public SpringSubframeworkOSGi<A> init() throws SSOAlreadyRunningException, SSORunningException{
+    public SpringSubframeworkOSGi init() throws SSOAlreadyRunningException, SSORunningException{
         if(status){
             throw new SSOAlreadyRunningException();
         }
@@ -77,7 +80,6 @@ public class SpringSubframeworkOSGi<A> {
         try{
             hook();
             bindOSGiToSpring();
-            context.getOSGiContext().startBundles();
         } catch(Exception e){
             throw new SSORunningException(e);
         }
@@ -89,7 +91,7 @@ public class SpringSubframeworkOSGi<A> {
         return status;
     }
 
-    public SSOContext<A> getContext(){
+    public SSOContext getContext(){
         return context;
     }
 

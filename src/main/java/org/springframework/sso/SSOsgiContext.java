@@ -15,6 +15,10 @@ public class SSOsgiContext {
         this.context = context;
     }
 
+    public void register(Class<?> clazz, String name, Object obj){
+        context.registerService(clazz.getName(), obj, null);
+    }
+
     public List<String> startBundles(){
         try{
             Bundle[] bundles = context.getBundles();
