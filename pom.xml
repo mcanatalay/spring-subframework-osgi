@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.springframework.sso</groupId>
 	<artifactId>sso</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<name>sso</name>
 	<description>
 		Using custom concierge framework to create subframework of OSGi under Spring projects.
