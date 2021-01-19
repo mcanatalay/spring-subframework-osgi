@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.springframework.sso</groupId>
 	<artifactId>sso</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>sso</name>
 	<description>
 		Using custom concierge framework to create subframework of OSGi under Spring projects.
@@ -27,9 +27,9 @@
 		<dependency>
 			<groupId>org.springframework.sso</groupId>
 			<artifactId>concierge</artifactId>
-			<version>6.0.1</version>
+			<version>6.0.2</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/external/concierge-6.0.1.jar</systemPath>
+			<systemPath>${project.basedir}/external/concierge-6.0.2.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
